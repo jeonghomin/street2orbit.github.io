@@ -239,42 +239,21 @@
 </section>
 
 
-<section class="section">
+<section class="section" id="abstract">
   <div class="container is-max-desktop">
-    <!-- Abstract. -->
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">Abstract</h2>
-        <div class="content has-text-justified">
-          <p>
-            We present the first method capable of photorealistically reconstructing a non-rigidly
-            deforming scene using photos/videos captured casually from mobile phones.
-          </p>
-          <p>
-            Our approach augments neural radiance fields
-            (NeRF) by optimizing an
-            additional continuous volumetric deformation field that warps each observed point into a
-            canonical 5D NeRF.
-            We observe that these NeRF-like deformation fields are prone to local minima, and
-            propose a coarse-to-fine optimization method for coordinate-based models that allows for
-            more robust optimization.
-            By adapting principles from geometry processing and physical simulation to NeRF-like
-            models, we propose an elastic regularization of the deformation field that further
-            improves robustness.
-          </p>
-          <p>
-            We show that <span class="dnerf">Nerfies</span> can turn casually captured selfie
-            photos/videos into deformable NeRF
-            models that allow for photorealistic renderings of the subject from arbitrary
-            viewpoints, which we dub <i>"nerfies"</i>. We evaluate our method by collecting data
-            using a
-            rig with two mobile phones that take time-synchronized photos, yielding train/validation
-            images of the same pose at different viewpoints. We show that our method faithfully
-            reconstructs non-rigidly deforming scenes and reproduces unseen views with high
-            fidelity.
-          </p>
-        </div>
-      </div>
+    <h2 class="title is-3">Abstract</h2>
+    <div class="content has-text-justified">
+      <p>
+        Cross-view image retrieval, particularly street-to-satellite matching, is a critical task for applications such as autonomous navigation, urban planning, and localization in GPS-denied environments. However, existing approaches often require supervised training on curated datasets and rely on panoramic or UAV-based images, which limits real-world deployment.
+      </p>
+      <p>
+        In this paper, we present a simple yet effective cross-view image retrieval framework that leverages a pretrained vision encoder and a large language model (LLM), requiring no additional training. Given a monocular street-view image, our method extracts geographic cues through web-based image search and LLM-based location inference, generates a satellite query via geocoding API, and retrieves matching tiles using a pretrained vision encoder (e.g., DINOv2) with PCA-based whitening feature refinement.
+      </p>
+      <p>
+        Despite using no ground-truth supervision or fine-tuning, our proposed method outperforms prior learning-based approaches on benchmark datasets under zero-shot settings. Moreover, our pipeline enables automatic construction of semantically aligned street-to-satellite datasets, offering a scalable and cost-efficient alternative to manual annotation. All source code will be made publicly available at <a href="https://street2orbit.github.io" target="_blank">street2orbit.github.io</a>.
+      </p>
+    </div>
+  </div>
     </div>
     <!--/ Abstract. -->
 
@@ -293,109 +272,35 @@
 </section>
 
 
-<section class="section">
+<section class="section" id="method">
   <div class="container is-max-desktop">
-
-    <div class="columns is-centered">
-
-      <!-- Visual Effects. -->
-      <div class="column">
-        <div class="content">
-          <h2 class="title is-3">Visual Effects</h2>
-          <p>
-            Using <i>nerfies</i> you can create fun visual effects. This Dolly zoom effect
-            would be impossible without nerfies since it would require going through a wall.
-          </p>
-          <video id="dollyzoom" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/dollyzoom-stacked.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-      </div>
-      <!--/ Visual Effects. -->
-
-      <!-- Matting. -->
-      <div class="column">
-        <h2 class="title is-3">Matting</h2>
-        <div class="columns is-centered">
-          <div class="column content">
-            <p>
-              As a byproduct of our method, we can also solve the matting problem by ignoring
-              samples that fall outside of a bounding box during rendering.
-            </p>
-            <video id="matting-video" controls playsinline height="100%">
-              <source src="./static/videos/matting.mp4"
-                      type="video/mp4">
-            </video>
-          </div>
-
-        </div>
-      </div>
+    <h2 class="title is-3">Method</h2>
+    <div class="content has-text-justified">
+      <p>
+        Our framework consists of three main stages: (1) Satellite query generation via location semantics, (2) Visual embedding and similarity-based retrieval, and (3) Embedding refinement via PCA-based whitening. The entire process is training-free and leverages only pretrained models.
+      </p>
+      <ol>
+        <li>
+          <strong>Location Semantics Extraction</strong>: We collect web-based context using Google Image Search with the input street-view image. The surrounding textual descriptions and metadata are aggregated.
+        </li>
+        <li>
+          <strong>LLM-Guided Location Inference</strong>: We prompt a large language model (Mistral 7B) to extract the most specific and geolocatable name from the retrieved text. This name is then passed to a geocoding API to acquire accurate latitude and longitude.
+        </li>
+        <li>
+          <strong>Satellite Tile Generation</strong>: Using the coordinates, we generate a satellite query image from Google Maps Static API centered at the inferred location.
+        </li>
+        <li>
+          <strong>Visual Embedding and Retrieval</strong>: Both the query satellite image and a gallery of pre-indexed tiles are passed through a pretrained vision encoder (DINOv2) to extract global features. Cosine similarity is computed for retrieval.
+        </li>
+        <li>
+          <strong>PCA-Based Whitening</strong>: To improve retrieval robustness, we apply a lightweight PCA whitening to decorrelate features and suppress low-level artifacts like lighting or texture.
+        </li>
+      </ol>
+      <p>
+        This architecture supports zero-shot generalization and enables scalable construction of street-to-satellite datasets via automated pairing.
+      </p>
     </div>
-    <!--/ Matting. -->
-
-    <!-- Animation. -->
-    <div class="columns is-centered">
-      <div class="column is-full-width">
-        <h2 class="title is-3">Animation</h2>
-
-        <!-- Interpolating. -->
-        <h3 class="title is-4">Interpolating states</h3>
-        <div class="content has-text-justified">
-          <p>
-            We can also animate the scene by interpolating the deformation latent codes of two input
-            frames. Use the slider here to linearly interpolate between the left frame and the right
-            frame.
-          </p>
-        </div>
-        <div class="columns is-vcentered interpolation-panel">
-          <div class="column is-3 has-text-centered">
-            <img src="./static/images/interpolate_start.jpg"
-                 class="interpolation-image"
-                 alt="Interpolate start reference image."/>
-            <p>Start Frame</p>
-          </div>
-          <div class="column interpolation-video-column">
-            <div id="interpolation-image-wrapper">
-              Loading...
-            </div>
-            <input class="slider is-fullwidth is-large is-info"
-                   id="interpolation-slider"
-                   step="1" min="0" max="100" value="0" type="range">
-          </div>
-          <div class="column is-3 has-text-centered">
-            <img src="./static/images/interpolate_end.jpg"
-                 class="interpolation-image"
-                 alt="Interpolation end reference image."/>
-            <p class="is-bold">End Frame</p>
-          </div>
-        </div>
-        <br/>
-        <!--/ Interpolating. -->
-
-        <!-- Re-rendering. -->
-        <h3 class="title is-4">Re-rendering the input video</h3>
-        <div class="content has-text-justified">
-          <p>
-            Using <span class="dnerf">Nerfies</span>, you can re-render a video from a novel
-            viewpoint such as a stabilized camera by playing back the training deformations.
-          </p>
-        </div>
-        <div class="content has-text-centered">
-          <video id="replay-video"
-                 controls
-                 muted
-                 preload
-                 playsinline
-                 width="75%">
-            <source src="./static/videos/replay.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <!--/ Re-rendering. -->
-
-      </div>
-    </div>
+  </div>
     <!--/ Animation. -->
 
 
